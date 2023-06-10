@@ -1,5 +1,5 @@
 const { Router } = require('express');
-
+const { authenticateRole } = require('../lib/auth');
 const router = Router();
 
 /*
@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
  * POST /courses - Creates a new Course with specified data and adds it to the application's database.  
  * Only an authenticated User with 'admin' role can create a new Course.
  */
-router.post('/', (req, res) => {
+router.post('/', authenticateRole(["admin"]), (req, res) => {
     try {
         //TODO
         res.status(200).send(req.originalUrl);
@@ -36,7 +36,7 @@ router.post('/', (req, res) => {
 });
 
 /*
- * GET /courses/{id} - Unique ID of a Course.  Exact type/format will depend on your implementation but will likely be either an integer or a string.
+ * GET /courses/{id} - Returns summary data about the Course, excluding the list of students enrolled in the course and the list of Assignments for the course.
  */
 router.get('/:id', (req, res) => {
     try {
@@ -54,7 +54,7 @@ router.get('/:id', (req, res) => {
  * PATCH /courses/{id} - Performs a partial update on the data for the Course.  Note that enrolled students and assignments cannot be modified via this endpoint.  
  * Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course can update Course information.
  */
-router.patch('/:id', (req, res) => {
+router.patch('/:id', authenticateRole(["admin", "instructor"]), (req, res) => {
     try {
         //TODO
         res.status(200).send(req.originalUrl);
@@ -70,7 +70,7 @@ router.patch('/:id', (req, res) => {
  * DELETE /courses/{id} - Completely removes the data for the specified Course, including all enrolled students, all Assignments, etc.  
  * Only an authenticated User with 'admin' role can remove a Course.
  */
-router.delete('/:id', (req, res) => {
+router.delete('/:id', authenticateRole(["admin"]), (req, res) => {
     try {
         //TODO
         res.status(200).send(req.originalUrl);
@@ -86,7 +86,7 @@ router.delete('/:id', (req, res) => {
  * GET /courses/{id}/students - Returns a list containing the User IDs of all students currently enrolled in the Course.  
  * Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId`
  */
-router.get('/:id/students', (req, res) => {
+router.get('/:id/students', authenticateRole(["admin", "instructor"]), (req, res) => {
     try {
         //TODO
         res.status(200).send(req.originalUrl);
@@ -102,7 +102,7 @@ router.get('/:id/students', (req, res) => {
  * POST /courses/{id}/students - Enrolls and/or unenrolls students from a Course.  
  * Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course can update the students enrolled in the Course. 
  */
-router.post('/:id/students', (req, res) => {
+router.post('/:id/students', authenticateRole(["admin", "instructor"]), (req, res) => {
     try {
         //TODO
         res.status(200).send(req.originalUrl);
@@ -118,7 +118,7 @@ router.post('/:id/students', (req, res) => {
  * GET /courses/{id}/students - Returns a CSV file containing information about all of the students currently enrolled in the Course, including names, IDs, and email addresses.  
  * Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course can fetch the course roster.  
  */
-router.get('/:id/roster', (req, res) => {
+router.get('/:id/roster', authenticateRole(["admin", "instructor"]), (req, res) => {
     try {
         //TODO
         res.status(200).send(req.originalUrl);
@@ -131,7 +131,7 @@ router.get('/:id/roster', (req, res) => {
 });
 
 /*
- * GET /courses/{id}/students - Returns a list containing the Assignment IDs of all Assignments for the Course.  
+ * GET /courses/{id}/assignments - Returns a list containing the Assignment IDs of all Assignments for the Course.  
  */
 router.get('/:id/assignments', (req, res) => {
     try {
