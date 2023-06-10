@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { authenticateRole } = require('../lib/auth');
+const { getAssignmentById } = require('../components/assignment');
 
 const router = Router();
 
@@ -22,10 +23,14 @@ router.post('/', authenticateRole(["admin", "instructor"]), (req, res) => {
 /*
  * GET /assignments/{id} - Returns summary data about the Assignment, excluding the list of Submissions.
  */
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res, next) => {
     try {
-        //TODO
-        res.status(200).send(req.originalUrl);
+        const assignment = await getAssignmentById(req.params.id);
+        if (assignment) {
+            res.status(200).send(assignment);
+        } else {
+            next();
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send({

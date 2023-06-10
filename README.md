@@ -5,4 +5,4 @@ Tarpaulin, a lightweight course management tool that’s an "alternative" to Can
 Final Project for CS493 Cloud Application Development
 
 Developer:
-```npm run dev```
+```npm run dev``` 

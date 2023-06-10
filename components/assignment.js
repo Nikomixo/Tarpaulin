@@ -1,3 +1,5 @@
+const mysqlPool = require('../lib/connection');
+
 const AssignmentSchema = {
     courseId: { required: true },
     title: { required: true },
@@ -14,3 +16,12 @@ const SubmissionSchema = {
     file: { required: true }
 }
 exports.SubmissionSchema = SubmissionSchema
+
+async function getAssignmentById(assignmentId) {
+    const [results] = await mysqlPool.query(
+        'SELECT * FROM assignments WHERE id = ?',
+        [ assignmentId ],
+    );
+    return results[0];
+}
+exports.getAssignmentById= getAssignmentById;
