@@ -10,9 +10,9 @@ services:
       - ./data/init.sql:/docker-entrypoint-initdb.d/schema.sql:ro
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
-      - MYSQL_DATABASE=tarpaulin_db
-      - MYSQL_USER=tarpaulin_db
-      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     networks:
       - mysql-network
 networks:
