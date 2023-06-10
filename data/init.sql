@@ -25,7 +25,7 @@ CREATE TABLE `userscourses` (
   PRIMARY KEY (`id`),
   FOREIGN KEY (`userid`) REFERENCES `users` (`id`),
   FOREIGN KEY (`courseid`) REFERENCES `courses` (`id`)
-)
+);
 
 CREATE TABLE `assignments` (
   `id` mediumint NOT NULL AUTO_INCREMENT,
@@ -35,7 +35,7 @@ CREATE TABLE `assignments` (
   `courseid` mediumint NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`courseid`) REFERENCES `courses` (`id`)
-)
+);
 
 CREATE TABLE `submissions` (
   `id` mediumint NOT NULL AUTO_INCREMENT,
@@ -50,28 +50,28 @@ CREATE TABLE `submissions` (
 );
 
 INSERT INTO users SET
-  name = `Dave Student`,
-  email = `davest@oregonstate.edu`,
-  password = `hunter2`,
-  role = `student`;
+  name = 'Dave Student',
+  email = 'davest@oregonstate.edu',
+  password = 'hunter2',
+  role = 'student';
 
 INSERT INTO users SET
-  name = `Jane Admin`,
-  email = `janead@oregonstate.edu`,
-  password = `hunter2`,
-  role = `admin`;
+  name = 'Jane Admin',
+  email = 'janead@oregonstate.edu',
+  password = 'hunter2',
+  role = 'admin';
 
 INSERT INTO users SET
-  name = `John Instructor`,
-  email = `johnin@oregonstate.edu`,
-  password = `hunter2`,
-  role = `instructor`;
+  name = 'John Instructor',
+  email = 'johnin@oregonstate.edu',
+  password = 'hunter2',
+  role = 'instructor';
 
 INSERT INTO courses SET
-  subjectcode = `CS`,
+  subjectcode = 'CS',
   number = 422,
-  title = `introductory smart fridge programming`
-  term = `sp22`
+  title = 'introductory smart fridge programming',
+  term = 'sp22',
   instructorid = 3;
 
 INSERT INTO userscourses SET
@@ -79,13 +79,13 @@ INSERT INTO userscourses SET
     courseid = 1;
 
 INSERT INTO assignments SET
-  title = `project 1`,
+  title = 'project 1',
   points = 50,
-  dueDate = "2022-06-14T17:00:00-07:00",
+  dueDate = '2022-06-14T17:00:00-07:00',
   courseid = 1;
 
 INSERT INTO submissions SET
-  timestamp = "2022-06-14T17:00:00-06:59",
+  timestamp = '2022-06-14T17:00:00-06:59',
   grade = 43.5,
   userid = 1,
   assignmentid = 1;
