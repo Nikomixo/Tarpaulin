@@ -1,12 +1,12 @@
 const { Router } = require('express');
-
+const { generateAuthToken, authenticateRole } = require('../lib/auth');
 const router = Router();
 
 /*
  * POST /users - Create and store a new application User with specified data and adds it to the application's database.  
  * Only an authenticated User with 'admin' role can create users with the 'admin' or 'instructor' roles.
  */
-router.get('/', (req, res) => {
+router.get('/', authenticateRole(["admin", "instructor", "student"]), (req, res) => {
     try {
         //TODO
         res.status(200).send(req.originalUrl);
@@ -39,7 +39,7 @@ router.post('/login', (req, res) => {
  * If the User has the 'student' role, the response should include a list of the IDs of the Courses the User is enrolled in.  
  * Only an authenticated User whose ID matches the ID of the requested User can fetch this information.
  */
-router.get('/:id', (req, res) => {
+router.get('/:id', authenticateRole(["admin", "instructor", "student"]), (req, res) => {
     try {
         //TODO
         res.status(200).send(req.originalUrl);
