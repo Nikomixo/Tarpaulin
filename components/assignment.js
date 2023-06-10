@@ -13,4 +13,4 @@ const SubmissionSchema = {
     grade: { required: true },
     file: { required: true }
 }
-exports.SubmissionSchema = SubmissionSchema
+exports.SubmissionSchema = SubmissionSchema;
