@@ -1,4 +1,5 @@
-const mysqlPool = require('../lib/connection');
+const db = require('../lib/connection');
+const { validateAgainstSchema, extractValidFields } = require('../lib/validation');
 
 const AssignmentSchema = {
     courseId: { required: true },
@@ -18,10 +19,20 @@ const SubmissionSchema = {
 exports.SubmissionSchema = SubmissionSchema
 
 async function getAssignmentById(assignmentId) {
-    const [results] = await mysqlPool.query(
+    const [results] = await db.query(
         'SELECT * FROM assignments WHERE id = ?',
         [ assignmentId ],
     );
     return results[0];
 }
 exports.getAssignmentById= getAssignmentById;
+
+async function insertNewAssignment(assignment) {
+    const validatedAssignment = extractValidFields(assignment, AssignmentSchema);
+    const [result] = await mysqlPool.query(
+        'INSERT INTO assignments SET ?',
+        [ validatedAssignment ],
+    );
+    return result.insertId;
+}
+exports.insertNewAssignment= insertNewAssignment;
