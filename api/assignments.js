@@ -15,7 +15,7 @@ router.post('/', authenticateRole(["admin", "instructor"]), async (req, res) => 
         if (validateAgainstSchema(req.body, AssignmentSchema)) {
             if (req.role == "admin" || await checkIfInstructorTeachesCourse(req.user, req.body.courseId)) {
                 const id = await insertNewAssignment(req.body);
-                res.status(201).send({ id: id});
+                res.status(201).send({ id: id });
             } else {
                 res.status(403).json({
                     error: "Unauthorized to access the specified resource"
@@ -30,7 +30,7 @@ router.post('/', authenticateRole(["admin", "instructor"]), async (req, res) => 
         console.error(err);
         res.status(500).send({
             error: `An internal server error occurred in ${req.originalUrl}.`
-        })
+        });
     }
 });
 
@@ -49,7 +49,7 @@ router.get('/:id', async (req, res, next) => {
         console.error(err);
         res.status(500).send({
             error: `An internal server error occurred in ${req.originalUrl}.`
-        })
+        });
     }
 });
 
@@ -77,7 +77,7 @@ router.patch('/:id', authenticateRole(["admin", "instructor"]), async (req, res)
         console.error(err);
         res.status(500).send({
             error: `An internal server error occurred in ${req.originalUrl}.`
-        })
+        });
     }
 });
 
@@ -104,7 +104,7 @@ router.delete('/:id', authenticateRole(["admin", "instructor"]), async (req, res
         console.error(err);
         res.status(500).send({
             error: `An internal server error occurred in ${req.originalUrl}.`
-        })
+        });
     }
 });
 
@@ -120,7 +120,7 @@ router.get('/:id/submissions', authenticateRole(["admin", "instructor"]), (req, 
         console.error(err);
         res.status(500).send({
             error: `An internal server error occurred in ${req.originalUrl}.`
-        })
+        });
     }
 });
 
@@ -136,7 +136,7 @@ router.post('/:id/submissions', authenticateRole(["student"]), (req, res) => {
         console.error(err);
         res.status(500).send({
             error: `An internal server error occurred in ${req.originalUrl}.`
-        })
+        });
     }
 });
 
