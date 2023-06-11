@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { authenticateRole } = require('../lib/auth');
-const { getAssignmentById, insertNewAssignment, AssignmentSchema } = require('../components/assignment');
+const { getAssignmentById, insertNewAssignment, updateAssignment, AssignmentSchema } = require('../components/assignment');
 const { checkIfInstructorTeachesCourse } = require('../components/course');
 const { validateAgainstSchema } = require('../lib/validation');
 
@@ -23,7 +23,7 @@ router.post('/', authenticateRole(["admin", "instructor"]), async (req, res) => 
             }
         } else {
             res.status(400).json({
-                error: "Request body is not a valid business object"
+                error: "Request body is not a valid assignment object"
             });
         }
     } catch (err) {
@@ -57,10 +57,22 @@ router.get('/:id', async (req, res, next) => {
  * PATCH /assignments/{id} - Performs a partial update on the data for the Assignment.  Note that submissions cannot be modified via this endpoint.  
  * Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course corresponding to the Assignment's `courseId` can update an Assignment.
  */
-router.patch('/:id', authenticateRole(["admin", "instructor"]), (req, res) => {
+router.patch('/:id', authenticateRole(["admin", "instructor"]), async (req, res) => {
     try {
-        //TODO
-        res.status(200).send(req.originalUrl);
+        if (validateAgainstSchema(req.body, AssignmentSchema)) {
+            if (req.role == "admin" || await checkIfInstructorTeachesCourse(req.user, req.body.courseId)) {
+                await updateAssignment(req.body, req.params.id);
+                res.status(200).send({});
+            } else {
+                res.status(403).json({
+                    error: "Unauthorized to access the specified resource"
+                });
+            }
+        } else {
+            res.status(400).json({
+                error: "Request body is not a valid assignment object"
+            });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send({

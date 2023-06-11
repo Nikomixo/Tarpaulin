@@ -37,3 +37,12 @@ async function insertNewAssignment(assignment) {
 }
 exports.insertNewAssignment= insertNewAssignment;
 
+async function updateAssignment(assignment, assignmentId) {
+    const validatedAssignment = extractValidFields(assignment, AssignmentSchema);
+    const [result] = await db.query(
+        'UPDATE assignments SET ? WHERE id = ?',
+        [ validatedAssignment, assignmentId ],
+    );
+    return result.affectedRows > 0;
+}
+exports.updateAssignment= updateAssignment;
