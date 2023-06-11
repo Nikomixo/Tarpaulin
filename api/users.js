@@ -1,15 +1,40 @@
 const { Router } = require('express');
 const { generateAuthToken, authenticateRole } = require('../lib/auth');
+const { validateAgainstSchema } = require('../lib/validation');
+const { UserSchema, insertNewUser, checkIfEmailExists } = require('../components/user');
+
 const router = Router();
 
 /*
  * POST /users - Create and store a new application User with specified data and adds it to the application's database.  
  * Only an authenticated User with 'admin' role can create users with the 'admin' or 'instructor' roles.
  */
-router.get('/', authenticateRole(["admin", "instructor", "student"]), (req, res) => {
+router.post('/', authenticateRole(["admin", "instructor", "student", ""]), async (req, res) => {
     try {
-        //TODO
-        res.status(200).send(req.originalUrl);
+        if (validateAgainstSchema(req.body, UserSchema)) {
+            if ((req.body.role == "admin" || req.body.role == "instructor") && req.role != "admin") {
+                res.status(403).send({
+                    error: `The request was not made by an authenticated user with the required permissions.`
+                });
+
+            } else if (await checkIfEmailExists(req.body.email)) {
+                res.status(400).send({
+                    error: `Email already in use.`
+                });
+
+            } else {
+                id = await insertNewUser(req.body);
+                res.status(201).json({
+                    id: id
+                });
+
+            }
+        } else {
+            res.status(400).send({
+                error: `The request body was either not present or did not contain a valid User object.`
+            });
+        }
+
     } catch (err) {
         console.error(err);
         res.status(500).send({
