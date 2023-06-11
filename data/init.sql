@@ -10,7 +10,7 @@ CREATE TABLE `users` (
 
 CREATE TABLE `courses` (
   `id` mediumint NOT NULL AUTO_INCREMENT,
-  `subjectcode` varchar(255) NOT NULL,
+  `subject` varchar(255) NOT NULL,
   `number` mediumint NOT NULL,
   `title` varchar(255) NOT NULL,
   `term` varchar(255) NOT NULL,
@@ -69,14 +69,14 @@ INSERT INTO users SET
   role = 'instructor';
 
 INSERT INTO courses SET
-  subjectcode = 'CS',
+  subject = 'CS',
   number = 422,
   title = 'introductory smart fridge programming',
   term = 'sp22',
   instructorid = 3;
 
 INSERT INTO courses SET
-  subjectcode = 'PSY',
+  subject = 'PSY',
   number = 203,
   title = 'introductions to the human mind',
   term = 'sp22',
