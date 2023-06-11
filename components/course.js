@@ -19,3 +19,12 @@ async function checkIfInstructorTeachesCourse(instructorId, courseId) {
     return instructorId == newid;
 }
 exports.checkIfInstructorTeachesCourse = checkIfInstructorTeachesCourse;
+
+async function getCourseById(courseId) {
+    const [results] = await db.query(
+        'SELECT * FROM courses WHERE id = ?',
+        [ courseId ],
+    );
+    return results[0];
+}
+exports.getCourseById = getCourseById;

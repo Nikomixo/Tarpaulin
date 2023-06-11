@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { authenticateRole } = require('../lib/auth');
-const { getAssignmentById, insertNewAssignment, updateAssignment, AssignmentSchema } = require('../components/assignment');
-const { checkIfInstructorTeachesCourse } = require('../components/course');
+const { getAssignmentById, insertNewAssignment, updateAssignment, deleteAssignment, AssignmentSchema } = require('../components/assignment');
+const { checkIfInstructorTeachesCourse} = require('../components/course');
 const { validateAgainstSchema } = require('../lib/validation');
 
 const router = Router();
@@ -85,10 +85,21 @@ router.patch('/:id', authenticateRole(["admin", "instructor"]), async (req, res)
  * DELETE /assignments/{id} - Completely removes the data for the specified Assignment, including all submissions.  
  * Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course corresponding to the Assignment's `courseId` can delete an Assignment.
  */
-router.delete('/:id', authenticateRole(["admin", "instructor"]), (req, res) => {
+router.delete('/:id', authenticateRole(["admin", "instructor"]), async (req, res, next) => {
     try {
-        //TODO
-        res.status(200).send(req.originalUrl);
+        const assignment = await getAssignmentById(req.params.id);
+        if (req.role == "admin" || await checkIfInstructorTeachesCourse(req.user, assignment["courseid"])) {
+            const sucessful = await deleteAssignment(req.params.id);
+            if (sucessful) {
+                res.status(204).send({});
+            } else {
+                next();
+            }
+        } else {
+            res.status(403).json({
+                error: "Unauthorized to access the specified resource"
+            });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send({

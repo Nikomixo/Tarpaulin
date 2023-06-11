@@ -46,3 +46,12 @@ async function updateAssignment(assignment, assignmentId) {
     return result.affectedRows > 0;
 }
 exports.updateAssignment= updateAssignment;
+
+async function deleteAssignment(assignmentId) {
+    const [ result ] = await db.query(
+        'DELETE FROM assignments WHERE id = ?',
+        [ assignmentId ]
+    );
+    return result.affectedRows > 0;
+}
+exports.deleteAssignment = deleteAssignment;
