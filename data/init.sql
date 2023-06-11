@@ -75,9 +75,21 @@ INSERT INTO courses SET
   term = 'sp22',
   instructorid = 3;
 
+INSERT INTO courses SET
+  subjectcode = 'PSY',
+  number = 203,
+  title = 'introductions to the human mind',
+  term = 'sp22',
+  instructorid = 3;
+
 INSERT INTO userscourses SET
-    userid = 1,
-    courseid = 1;
+  userid = 1,
+  courseid = 1;
+
+INSERT INTO userscourses SET
+  userid = 1,
+  courseid = 2;
+
 
 INSERT INTO assignments SET
   title = 'project 1',

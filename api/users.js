@@ -1,7 +1,16 @@
 const { Router } = require('express');
 const { generateAuthToken, authenticateRole } = require('../lib/auth');
 const { validateAgainstSchema } = require('../lib/validation');
-const { UserSchema, UserLoginSchema, insertNewUser, checkIfEmailExists, validateUser, getUserFromEmail } = require('../components/user');
+const {
+    UserSchema,
+    UserLoginSchema,
+    insertNewUser,
+    checkIfEmailExists,
+    validateUser,
+    getUserFromEmail,
+    userExists,
+    getUserbyId
+} = require('../components/user');
 
 const router = Router();
 
@@ -80,10 +89,19 @@ router.post('/login', async (req, res) => {
  * If the User has the 'student' role, the response should include a list of the IDs of the Courses the User is enrolled in.  
  * Only an authenticated User whose ID matches the ID of the requested User can fetch this information.
  */
-router.get('/:id', authenticateRole(["admin", "instructor", "student"]), (req, res) => {
+router.get('/:id', authenticateRole(["admin", "instructor", "student"]), async (req, res) => {
     try {
-        //TODO
-        res.status(200).send(req.originalUrl);
+        if (!userExists(req.params.id)) {
+            res.status(404).send({
+                error: `Specified user ${req.params.id} not found.`
+            })
+        } else if (req.params.id != req.user) {
+            res.status(403).send({
+                error: `The request was not made by an authenticated user with the required permissions.`
+            });
+        } else {
+            res.status(200).json(await getUserbyId(req.params.id));
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send({

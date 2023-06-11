@@ -22,10 +22,18 @@ async function checkIfEmailExists(email) {
         "SELECT * FROM users WHERE email = ?",
         [email]
     )
-    console.log(`email: ${email}, results: ${results.length > 0}`);
     return results.length > 0;
 }
 exports.checkIfEmailExists = checkIfEmailExists;
+
+async function userExists(id) {
+    const [results] = await db.query(
+        "SELECT * FROM users WHERE id = ?",
+        [id]
+    )
+    return results.length > 0;
+}
+exports.userExists = userExists;
 
 async function insertNewUser(user) {
     const validatedUser = extractValidFields(
@@ -34,8 +42,6 @@ async function insertNewUser(user) {
     );
 
     validatedUser.password = await bcrypt.hash(validatedUser.password, 8);
-
-    console.log(validatedUser);
 
     const [results] = await db.query(
         "INSERT INTO users SET ?",
@@ -51,7 +57,6 @@ async function validateUser(email, password) {
         [email]
     );
     try {
-        console.log("password:\n", result[0].password);
         authenticated = await bcrypt.compare(password, result[0].password);
         return authenticated;
     } catch (err) {
@@ -68,3 +73,35 @@ async function getUserFromEmail(email) {
     return results[0];
 }
 exports.getUserFromEmail = getUserFromEmail;
+
+async function getUserbyId(id) {
+    const [user] = await db.query(
+        "SELECT id, name, email, role FROM users WHERE id = ?",
+        [id]
+    );
+
+    let res = {
+        id: user[0].id,
+        name: user[0].name,
+        email: user[0].email,
+        role: user[0].role
+    };
+
+    if (user[0].role == "instructor") {
+        const [courses] = await db.query(
+            "SELECT id FROM courses WHERE instructorid = ?",
+            [id]
+        );
+        res["courses"] = courses.map(courses => courses.id);
+
+    } else if (user[0].role == "student") {
+        const [courses] = await db.query(
+            "SELECT courseid FROM userscourses WHERE userid = ?",
+            [id]
+        );
+        res["courses"] = courses.map(courses => courses.courseid);
+    }
+
+    return res;
+}
+exports.getUserbyId = getUserbyId;
