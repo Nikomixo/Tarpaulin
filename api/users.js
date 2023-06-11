@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { generateAuthToken, authenticateRole } = require('../lib/auth');
 const { validateAgainstSchema } = require('../lib/validation');
-const { UserSchema, insertNewUser, checkIfEmailExists } = require('../components/user');
+const { UserSchema, UserLoginSchema, insertNewUser, checkIfEmailExists, validateUser, getUserFromEmail } = require('../components/user');
 
 const router = Router();
 
@@ -12,6 +12,7 @@ const router = Router();
 router.post('/', authenticateRole(["admin", "instructor", "student", ""]), async (req, res) => {
     try {
         if (validateAgainstSchema(req.body, UserSchema)) {
+            // if new user is admin or instructor, check bearer role == admin
             if ((req.body.role == "admin" || req.body.role == "instructor") && req.role != "admin") {
                 res.status(403).send({
                     error: `The request was not made by an authenticated user with the required permissions.`
@@ -46,10 +47,25 @@ router.post('/', authenticateRole(["admin", "instructor", "student", ""]), async
 /*
  * POST /users/login - Authenticate a specific User with their email address and password.
  */
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     try {
-        //TODO
-        res.status(200).send(req.originalUrl);
+        if (validateAgainstSchema, UserLoginSchema) {
+            if (await validateUser(req.body.email, req.body.password)) {
+                user = await getUserFromEmail(req.body.email);
+
+                res.status(200).json({
+                    token: generateAuthToken(user.id, user.role)
+                });
+            } else {
+                res.status(401).json({
+                    error: "The specified credentials were invalid."
+                });
+            }
+        } else {
+            res.status(400).send({
+                error: `The request body was either not present or did not contain all of the required fields.`
+            });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send({

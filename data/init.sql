@@ -53,19 +53,19 @@ CREATE TABLE `submissions` (
 INSERT INTO users SET
   name = 'Dave Student',
   email = 'davest@oregonstate.edu',
-  password = 'hunter2',
+  password = '$2a$08$H.Jop7J.lB2kJNwirRPFLeSabLdvxCm8PqKKLA901cGMDyk94XL1a',
   role = 'student';
 
 INSERT INTO users SET
   name = 'Jane Admin',
   email = 'janead@oregonstate.edu',
-  password = 'hunter2',
+  password = '$2a$08$H.Jop7J.lB2kJNwirRPFLeSabLdvxCm8PqKKLA901cGMDyk94XL1a',
   role = 'admin';
 
 INSERT INTO users SET
   name = 'John Instructor',
   email = 'johnin@oregonstate.edu',
-  password = 'hunter2',
+  password = '$2a$08$H.Jop7J.lB2kJNwirRPFLeSabLdvxCm8PqKKLA901cGMDyk94XL1a',
   role = 'instructor';
 
 INSERT INTO courses SET
