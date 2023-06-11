@@ -1,6 +1,8 @@
 const { Router } = require('express');
 const { authenticateRole } = require('../lib/auth');
-const { getAssignmentById } = require('../components/assignment');
+const { getAssignmentById, insertNewAssignment, AssignmentSchema } = require('../components/assignment');
+const { checkIfInstructorTeachesCourse } = require('../components/course');
+const { validateAgainstSchema } = require('../lib/validation');
 
 const router = Router();
 
@@ -8,10 +10,22 @@ const router = Router();
  * POST /assignments - Create and store a new Assignment with specified data and adds it to the application's database.  
  * Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course corresponding to the Assignment's `courseId` can create an Assignment.
  */
-router.post('/', authenticateRole(["admin", "instructor"]), (req, res) => {
+router.post('/', authenticateRole(["admin", "instructor"]), async (req, res) => {
     try {
-        //TODO
-        res.status(200).send(req.originalUrl);
+        if (validateAgainstSchema(req.body, AssignmentSchema)) {
+            if (req.role == "admin" || await checkIfInstructorTeachesCourse(req.user, req.body.courseId)) {
+                const id = await insertNewAssignment(req.body);
+                res.status(201).send({ id: id});
+            } else {
+                res.status(403).json({
+                    error: "Unauthorized to access the specified resource"
+                });
+            }
+        } else {
+            res.status(400).json({
+                error: "Request body is not a valid business object"
+            });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send({

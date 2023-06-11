@@ -15,6 +15,7 @@ async function checkIfInstructorTeachesCourse(instructorId, courseId) {
         'SELECT * FROM courses WHERE id = ?',
         [ courseId ],
     );
-    return instructorId == results[0]["instructorid"];
+    newid = results[0]["instructorid"];
+    return instructorId == newid;
 }
 exports.checkIfInstructorTeachesCourse = checkIfInstructorTeachesCourse;

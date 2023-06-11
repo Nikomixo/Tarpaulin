@@ -4,7 +4,8 @@ CREATE TABLE `users` (
     `email` varchar(255) NOT NULL,
     `password` varchar(255) NOT NULL,
     `role` varchar(255) NOT NULL,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE (`email`)
 );
 
 CREATE TABLE `courses` (
@@ -31,7 +32,7 @@ CREATE TABLE `assignments` (
   `id` mediumint NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `points` float,
-  `dueDate` varchar(255),
+  `due` varchar(255),
   `courseid` mediumint NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`courseid`) REFERENCES `courses` (`id`)
@@ -81,7 +82,7 @@ INSERT INTO userscourses SET
 INSERT INTO assignments SET
   title = 'project 1',
   points = 50,
-  dueDate = '2022-06-14T17:00:00-07:00',
+  due = '2022-06-14T17:00:00-07:00',
   courseid = 1;
 
 INSERT INTO submissions SET

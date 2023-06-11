@@ -25,14 +25,15 @@ async function getAssignmentById(assignmentId) {
     );
     return results[0];
 }
-exports.getAssignmentById= getAssignmentById;
+exports.getAssignmentById = getAssignmentById;
 
 async function insertNewAssignment(assignment) {
     const validatedAssignment = extractValidFields(assignment, AssignmentSchema);
-    const [result] = await mysqlPool.query(
+    const [result] = await db.query(
         'INSERT INTO assignments SET ?',
         [ validatedAssignment ],
     );
     return result.insertId;
 }
 exports.insertNewAssignment= insertNewAssignment;
+
