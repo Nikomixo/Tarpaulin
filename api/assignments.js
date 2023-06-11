@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { authenticateRole } = require('../lib/auth');
 const { getAssignmentById, insertNewAssignment, updateAssignment, deleteAssignment, AssignmentSchema } = require('../components/assignment');
-const { checkIfInstructorTeachesCourse} = require('../components/course');
+const { checkIfInstructorTeachesCourse } = require('../components/course');
 const { validateAgainstSchema } = require('../lib/validation');
 
 const router = Router();
