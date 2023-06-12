@@ -10,6 +10,12 @@ const CourseSchema = {
 }
 exports.CourseSchema = CourseSchema;
 
+const AddOrRemoveStudentsSchema = {
+    add: { required: true },
+    remove: { required: true }
+}
+exports.AddOrRemoveStudentsSchema = AddOrRemoveStudentsSchema
+
 async function checkIfInstructorTeachesCourse(instructorId, courseId) {
     const [results] = await db.query(
         'SELECT * FROM courses WHERE id = ?',
@@ -87,3 +93,56 @@ async function getCoursePage(page, subject, number, term) {
     };
 }
 exports.getCoursePage = getCoursePage;
+
+async function updateCourse(course, courseId) {
+    const validatedCourse = extractValidFields(course, CourseSchema);
+    const [result] = await db.query(
+        'UPDATE courses SET ? WHERE id = ?',
+        [ validatedCourse, courseId ],
+    );
+    return result.affectedRows > 0;
+}
+exports.updateCourse= updateCourse;
+
+async function deleteCourse(courseId) {
+    const [ result ] = await db.query(
+        'DELETE FROM courses WHERE id = ?',
+        [ courseId ]
+    );
+    return result.affectedRows > 0;
+}
+exports.deleteCourse = deleteCourse;
+
+async function getStudentsInCourse(courseId) {
+    const [ results ] = await db.query(
+        'SELECT userid FROM userscourses WHERE courseid = ?',
+        [ courseId ]
+    );
+    formattedResults = [];
+    for (let i = 0; i < results.length; i++) {
+        formattedResults.push(results[i]["userid"])
+    }
+    return formattedResults;
+}
+exports.getStudentsInCourse = getStudentsInCourse;
+
+async function addStudentsToCourse(courseId, students) {
+    for ( let i = 0; i < students.length; i++) {
+        student = {"courseId": courseId, "userId": students[i]};
+        const [ results ] = await db.query(
+            'INSERT INTO userscourses SET ?',
+            [student]
+        );
+    };
+}
+exports.addStudentsToCourse = addStudentsToCourse;
+
+async function removeStudentsFromCourse(courseId, students) {
+    for ( let i = 0; i < students.length; i++) {
+        const [ results ] = await db.query(
+            'DELETE FROM userscourses WHERE userId = ? AND courseId = ?',
+            [students[i], courseId]
+        );
+    };
+}
+exports.removeStudentsFromCourse = removeStudentsFromCourse;
