@@ -126,6 +126,19 @@ async function getStudentsInCourse(courseId) {
 }
 exports.getStudentsInCourse = getStudentsInCourse;
 
+async function getRosterForCourse(courseId) {
+    const [ results ] = await db.query(
+        'SELECT u.id, u.name, u.email FROM users AS u, userscourses AS uc WHERE uc.courseid = ? AND u.id = uc.userid',
+        [ courseId ]
+    );
+    formattedResults = "";
+    for (let i = 0; i < results.length; i++) {
+        formattedResults = formattedResults + results[i]["id"] +  ", " + results[i]["name"] +  ", " + results[i]["email"] +  "\n";
+    }
+    return formattedResults;
+}
+exports.getRosterForCourse = getRosterForCourse;
+
 async function addStudentsToCourse(courseId, students) {
     for ( let i = 0; i < students.length; i++) {
         student = {"courseId": courseId, "userId": students[i]};

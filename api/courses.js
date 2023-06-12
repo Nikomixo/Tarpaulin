@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { authenticateRole } = require('../lib/auth');
-const { CourseSchema, checkIfInstructorTeachesCourse, getCourseById, insertNewCourse, getCoursePage, updateCourse, deleteCourse, getStudentsInCourse, AddOrRemoveStudentsSchema, addStudentsToCourse, removeStudentsFromCourse } = require('../components/course');
+const { CourseSchema, checkIfInstructorTeachesCourse, getCourseById, insertNewCourse, getCoursePage, updateCourse, deleteCourse, getStudentsInCourse, AddOrRemoveStudentsSchema, addStudentsToCourse, removeStudentsFromCourse, getRosterForCourse } = require('../components/course');
+const { getAssignmentsInCourse } = require('../components/assignment');
 const { validateAgainstSchema } = require('../lib/validation');
 const router = Router();
 
@@ -190,8 +191,15 @@ router.post('/:id/students', authenticateRole(["admin", "instructor"]), async (r
  */
 router.get('/:id/roster', authenticateRole(["admin", "instructor"]), async (req, res) => {
     try {
-        //TODO
-        res.status(200).send(req.originalUrl);
+        if (req.role == "admin" || await checkIfInstructorTeachesCourse(req.user, req.params.id)) {
+            results = await getRosterForCourse(req.params.id);
+            res.type('text/csv');
+            res.status(200).send(results);
+        } else {
+            res.status(403).json({
+                error: "Unauthorized to access the specified resource"
+            });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send({
@@ -205,8 +213,8 @@ router.get('/:id/roster', authenticateRole(["admin", "instructor"]), async (req,
  */
 router.get('/:id/assignments', async (req, res) => {
     try {
-        //TODO
-        res.status(200).send(req.originalUrl);
+        results = await getAssignmentsInCourse(req.params.id);
+        res.status(200).send(results);
     } catch (err) {
         console.error(err);
         res.status(500).send({

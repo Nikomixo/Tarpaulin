@@ -55,3 +55,16 @@ async function deleteAssignment(assignmentId) {
     return result.affectedRows > 0;
 }
 exports.deleteAssignment = deleteAssignment;
+
+async function getAssignmentsInCourse(courseId) {
+    const [results] = await db.query(
+        'SELECT id FROM assignments WHERE courseid = ?',
+        [ courseId ],
+    );
+    formattedResults = [];
+    for (let i = 0; i < results.length; i++) {
+        formattedResults.push(results[i]["id"])
+    }
+    return formattedResults;
+}  
+exports.getAssignmentsInCourse = getAssignmentsInCourse;
