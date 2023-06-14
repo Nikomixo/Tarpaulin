@@ -10,7 +10,7 @@ const router = Router();
  * This list should be paginated.  
  * The Courses returned should not contain the list of students in the Course or the list of Assignments for the Course.
  */
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
         const coursePage = await getCoursePage(req.query.page, req.query.subject, req.query.number, req.query.term);
         if (coursePage) {
@@ -70,7 +70,7 @@ router.post('/', authenticateRole(["admin"]), async (req, res) => {
 /*
  * GET /courses/{id} - Returns summary data about the Course, excluding the list of students enrolled in the course and the list of Assignments for the course.
  */
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
     try {
         const course = await getCourseById(req.params.id);
         if (course) {
@@ -118,7 +118,7 @@ router.patch('/:id', authenticateRole(["admin", "instructor"]), async (req, res)
  * DELETE /courses/{id} - Completely removes the data for the specified Course, including all enrolled students, all Assignments, etc.  
  * Only an authenticated User with 'admin' role can remove a Course.
  */
-router.delete('/:id', authenticateRole(["admin"]), async (req, res) => {
+router.delete('/:id', authenticateRole(["admin"]), async (req, res, next) => {
     try {
         const sucessful = await deleteCourse(req.params.id);
         if (sucessful) {
@@ -138,11 +138,15 @@ router.delete('/:id', authenticateRole(["admin"]), async (req, res) => {
  * GET /courses/{id}/students - Returns a list containing the User IDs of all students currently enrolled in the Course.  
  * Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId`
  */
-router.get('/:id/students', authenticateRole(["admin", "instructor"]), async (req, res) => {
-    try {            
+router.get('/:id/students', authenticateRole(["admin", "instructor"]), async (req, res, next) => {
+    try {
         if (req.role == "admin" || await checkIfInstructorTeachesCourse(req.user, req.params.id)) {
             students = await getStudentsInCourse(req.params.id);
-            res.status(200).send(students);
+            if (students) {
+                res.status(200).send(students);
+            } else {
+                next();
+            }
         } else {
             res.status(403).json({
                 error: "Unauthorized to access the specified resource"

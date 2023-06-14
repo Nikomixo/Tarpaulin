@@ -89,6 +89,14 @@ INSERT INTO courses SET
   term = 'wi21',
   instructorid = 3;
 
+INSERT INTO courses SET
+  subject = 'CS',
+  number = 483,
+  title = 'c',
+  term = 'fa21',
+  instructorid = 3;
+
+
 INSERT INTO userscourses SET
   userid = 1,
   courseid = 1;
