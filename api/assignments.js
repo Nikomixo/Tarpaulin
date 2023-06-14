@@ -8,7 +8,8 @@ const {
     SubmissionSchema,
     insertNewSubmission,
     checkStudentInCourse,
-    getSubmissionFileById
+    getSubmissionFileById,
+    getSubmissionPage
 } = require('../components/submission');
 
 const router = Router();
@@ -119,10 +120,19 @@ router.delete('/:id', authenticateRole(["admin", "instructor"]), async (req, res
  * GET /assignments/{id}/submissions - Returns the list of all Submissions for an Assignment.  This list should be paginated.  
  * Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course corresponding to the Assignment's `courseId` can fetch the Submissions for an Assignment.
  */
-router.get('/:id/submissions', authenticateRole(["admin", "instructor"]), (req, res) => {
+router.get('/:id/submissions', authenticateRole(["admin", "instructor"]), async (req, res) => {
     try {
-        //TODO
-        res.status(200).send(req.originalUrl);
+        const assignment = getAssignmentById(req.params.id);
+        if (req.role == "admin" || req.role == await checkIfInstructorTeachesCourse(req.user, assignment["courseid"])) {
+            let page = parseInt(req.query.page) || 1;
+            let studentid = parseInt(req.query.studentId) || -1;
+            const submissionsPage = await getSubmissionPage(page, req.params.id, studentid);
+            res.status(200).send(submissionsPage);
+        } else {
+            res.status(403).json({
+                error: "Unauthorized to access the specified resource"
+            });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send({
@@ -149,7 +159,6 @@ router.post(
     async (req, res) => {
         if (validateAgainstSchema(req.body, SubmissionSchema) && req.file) {
             try {
-                //TODO
                 const submission = {
                     timestamp: req.body.timestamp,
                     filepath: req.file.path,
@@ -159,8 +168,11 @@ router.post(
 
                 let id = await insertNewSubmission(submission);
                 res.status(201).send({
-                    id: id,
-                    download: `/assignments/submissions/${id}`
+                    'assignmentId': req.params.id,
+                    'studentId': req.user,
+                    'timestamp': req.body.timestamp,
+                    'grade': null,
+                    'file': `/assignments/submissions/${id}`
                 })
             } catch (err) {
                 console.error(err);

@@ -88,3 +88,70 @@ const upload = multer({
     }
 });
 exports.upload = upload;
+
+async function getSubmissionCount() {
+    const [results] = await db.query(
+        "SELECT * FROM submissions"
+    );
+
+    return results.length;
+}
+
+async function getSubmissionPage(page, assignmentid, studentid) {
+    let query = "SELECT * FROM submissions WHERE assignmentid = ? "
+    if (studentid >= 0) {
+        query += "AND studentid = ?"
+        params = [assignmentid, studentid]
+    } else {
+        params = [assignmentid]
+    }
+
+    const [all_results] = await db.query(
+        query,
+        params
+    )
+    const count = all_results.length;
+
+    const numPerPage = 3;
+    const lastPage = Math.ceil(count / numPerPage);
+    page = page > lastPage ? lastPage : page;
+    page = page < 1 ? 1 : page;
+
+    const offset = (page - 1) * numPerPage;
+
+    query += " ORDER BY id LIMIT ?, ?";
+    params = params.concat([offset, numPerPage]);
+
+    const [results] = await db.query(
+        query,
+        params
+    )
+
+    var submissions = results.map((s) => {
+        return {
+            'assignmentId': s.assignmentid,
+            'studentId': s.studentid,
+            'timestamp': s.timestamp,
+            'grade': s.grade,
+            'file': `/assignments/submissions/${s.id}`
+        }
+    })
+
+    const links = {};
+    if (page < lastPage) {
+        links.nextPage = `/assignments/${assignmentid}/submissions?page=${page + 1}`;
+        links.lastPage = `/assignments/${assignmentid}/submissions?page=${lastPage}`;
+    }
+    if (page > 1) {
+        links.prevPage = `/assignments/${assignmentid}/submissions?page=${page - 1}`;
+        links.firstPage = `/assignments/${assignmentid}/submissions?page=1`;
+    }
+    return {
+        submissions: submissions,
+        page: page,
+        totalPages: lastPage,
+        pageSize: numPerPage,
+        links: links
+    }
+}
+exports.getSubmissionPage = getSubmissionPage;

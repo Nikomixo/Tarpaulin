@@ -76,7 +76,7 @@ async function getCoursePage(page, subject, number, term) {
     if (!page) {
         page = 1;
     }
-    const pageSize = 10;
+    const pageSize = 3;
     const lastPage = Math.ceil(count / pageSize);
     page = page > lastPage ? lastPage : page;
     page = page < 1 ? 1 : page;
