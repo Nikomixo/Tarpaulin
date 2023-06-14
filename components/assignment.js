@@ -9,19 +9,10 @@ const AssignmentSchema = {
 }
 exports.AssignmentSchema = AssignmentSchema;
 
-const SubmissionSchema = {
-    assignmentId: { required: true },
-    studentId: { required: true },
-    timestamp: { required: true },
-    grade: { required: true },
-    file: { required: true }
-}
-exports.SubmissionSchema = SubmissionSchema
-
 async function getAssignmentById(assignmentId) {
     const [results] = await db.query(
         'SELECT * FROM assignments WHERE id = ?',
-        [ assignmentId ],
+        [assignmentId],
     );
     return results[0];
 }
@@ -31,26 +22,26 @@ async function insertNewAssignment(assignment) {
     const validatedAssignment = extractValidFields(assignment, AssignmentSchema);
     const [result] = await db.query(
         'INSERT INTO assignments SET ?',
-        [ validatedAssignment ],
+        [validatedAssignment],
     );
     return result.insertId;
 }
-exports.insertNewAssignment= insertNewAssignment;
+exports.insertNewAssignment = insertNewAssignment;
 
 async function updateAssignment(assignment, assignmentId) {
     const validatedAssignment = extractValidFields(assignment, AssignmentSchema);
     const [result] = await db.query(
         'UPDATE assignments SET ? WHERE id = ?',
-        [ validatedAssignment, assignmentId ],
+        [validatedAssignment, assignmentId],
     );
     return result.affectedRows > 0;
 }
-exports.updateAssignment= updateAssignment;
+exports.updateAssignment = updateAssignment;
 
 async function deleteAssignment(assignmentId) {
-    const [ result ] = await db.query(
+    const [result] = await db.query(
         'DELETE FROM assignments WHERE id = ?',
-        [ assignmentId ]
+        [assignmentId]
     );
     return result.affectedRows > 0;
 }
@@ -59,12 +50,12 @@ exports.deleteAssignment = deleteAssignment;
 async function getAssignmentsInCourse(courseId) {
     const [results] = await db.query(
         'SELECT id FROM assignments WHERE courseid = ?',
-        [ courseId ],
+        [courseId],
     );
     formattedResults = [];
     for (let i = 0; i < results.length; i++) {
         formattedResults.push(results[i]["id"])
     }
     return formattedResults;
-}  
+}
 exports.getAssignmentsInCourse = getAssignmentsInCourse;

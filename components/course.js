@@ -19,7 +19,7 @@ exports.AddOrRemoveStudentsSchema = AddOrRemoveStudentsSchema
 async function checkIfInstructorTeachesCourse(instructorId, courseId) {
     const [results] = await db.query(
         'SELECT * FROM courses WHERE id = ?',
-        [ courseId ],
+        [courseId],
     );
     newid = results[0]["instructorid"];
     return instructorId == newid;
@@ -29,7 +29,7 @@ exports.checkIfInstructorTeachesCourse = checkIfInstructorTeachesCourse;
 async function getCourseById(courseId) {
     const [results] = await db.query(
         'SELECT * FROM courses WHERE id = ?',
-        [ courseId ],
+        [courseId],
     );
     return results[0];
 }
@@ -39,7 +39,7 @@ async function insertNewCourse(course) {
     const validatedCourse = extractValidFields(course, CourseSchema);
     const [result] = await db.query(
         'INSERT INTO courses SET ?',
-        [ validatedCourse ],
+        [validatedCourse],
     );
     return result.insertId;
 }
@@ -49,21 +49,21 @@ async function getCoursePage(page, subject, number, term) {
     var sql = "";
     var sum = 0;
     if (subject) {
-        sum = sum+1;
+        sum = sum + 1;
         sql = sql + " subject='" + subject + "'";
     }
     if (number) {
         if (sum > 0) {
             sql = sql + " AND"
         }
-        sum = sum+1;
-        sql = sql + " number='" + number+ "'";
+        sum = sum + 1;
+        sql = sql + " number='" + number + "'";
     }
     if (term) {
         if (sum > 0) {
             sql = sql + " AND"
         }
-        sum = sum+1;
+        sum = sum + 1;
         sql = sql + " term='" + term + "'";
     }
     if (sum > 0) {
@@ -84,7 +84,7 @@ async function getCoursePage(page, subject, number, term) {
 
     sql = "SELECT * FROM courses" + sql + " LIMIT " + pageSize + " OFFSET " + offset;
     const [results] = await db.query(sql);
-    
+
     return {
         courses: results,
         page: page,
@@ -98,25 +98,25 @@ async function updateCourse(course, courseId) {
     const validatedCourse = extractValidFields(course, CourseSchema);
     const [result] = await db.query(
         'UPDATE courses SET ? WHERE id = ?',
-        [ validatedCourse, courseId ],
+        [validatedCourse, courseId],
     );
     return result.affectedRows > 0;
 }
-exports.updateCourse= updateCourse;
+exports.updateCourse = updateCourse;
 
 async function deleteCourse(courseId) {
-    const [ result ] = await db.query(
+    const [result] = await db.query(
         'DELETE FROM courses WHERE id = ?',
-        [ courseId ]
+        [courseId]
     );
     return result.affectedRows > 0;
 }
 exports.deleteCourse = deleteCourse;
 
 async function getStudentsInCourse(courseId) {
-    const [ results ] = await db.query(
+    const [results] = await db.query(
         'SELECT userid FROM userscourses WHERE courseid = ?',
-        [ courseId ]
+        [courseId]
     );
     formattedResults = [];
     for (let i = 0; i < results.length; i++) {
@@ -127,22 +127,22 @@ async function getStudentsInCourse(courseId) {
 exports.getStudentsInCourse = getStudentsInCourse;
 
 async function getRosterForCourse(courseId) {
-    const [ results ] = await db.query(
+    const [results] = await db.query(
         'SELECT u.id, u.name, u.email FROM users AS u, userscourses AS uc WHERE uc.courseid = ? AND u.id = uc.userid',
-        [ courseId ]
+        [courseId]
     );
     formattedResults = "";
     for (let i = 0; i < results.length; i++) {
-        formattedResults = formattedResults + results[i]["id"] +  ", " + results[i]["name"] +  ", " + results[i]["email"] +  "\n";
+        formattedResults = formattedResults + results[i]["id"] + ", " + results[i]["name"] + ", " + results[i]["email"] + "\n";
     }
     return formattedResults;
 }
 exports.getRosterForCourse = getRosterForCourse;
 
 async function addStudentsToCourse(courseId, students) {
-    for ( let i = 0; i < students.length; i++) {
-        student = {"courseId": courseId, "userId": students[i]};
-        const [ results ] = await db.query(
+    for (let i = 0; i < students.length; i++) {
+        student = { "courseId": courseId, "userId": students[i] };
+        const [results] = await db.query(
             'INSERT INTO userscourses SET ?',
             [student]
         );
@@ -151,8 +151,8 @@ async function addStudentsToCourse(courseId, students) {
 exports.addStudentsToCourse = addStudentsToCourse;
 
 async function removeStudentsFromCourse(courseId, students) {
-    for ( let i = 0; i < students.length; i++) {
-        const [ results ] = await db.query(
+    for (let i = 0; i < students.length; i++) {
+        const [results] = await db.query(
             'DELETE FROM userscourses WHERE userId = ? AND courseId = ?',
             [students[i], courseId]
         );

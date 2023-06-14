@@ -42,11 +42,11 @@ CREATE TABLE `submissions` (
   `id` mediumint NOT NULL AUTO_INCREMENT,
   `timestamp` varchar(255) NOT NULL,
   `grade` float,
-  `file` mediumblob,
-  `userid` mediumint NOT NULL,
+  `filepath` varchar(255) NOT NULL,
+  `studentid` mediumint NOT NULL,
   `assignmentid` mediumint NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`userid`) REFERENCES `users` (`id`),
+  FOREIGN KEY (`studentid`) REFERENCES `users` (`id`),
   FOREIGN KEY (`assignmentid`) REFERENCES `assignments` (`id`)
 );
 
@@ -82,6 +82,13 @@ INSERT INTO courses SET
   term = 'sp22',
   instructorid = 3;
 
+INSERT INTO courses SET
+  subject = 'HIS',
+  number = 101,
+  title = 'a brief history to history',
+  term = 'wi21',
+  instructorid = 3;
+
 INSERT INTO userscourses SET
   userid = 1,
   courseid = 1;
@@ -90,15 +97,14 @@ INSERT INTO userscourses SET
   userid = 1,
   courseid = 2;
 
-
 INSERT INTO assignments SET
   title = 'project 1',
   points = 50,
   due = '2022-06-14T17:00:00-07:00',
   courseid = 1;
 
-INSERT INTO submissions SET
-  timestamp = '2022-06-14T17:00:00-06:59',
-  grade = 43.5,
-  userid = 1,
-  assignmentid = 1;
+INSERT INTO assignments SET
+  title = 'busywork paper 1',
+  points = 20,
+  due = '2022-06-14T17:00:00-07:00',
+  courseid = 3;
