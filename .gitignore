@@ -1,5 +1,5 @@
 .env
-./components/uploads/
+components/uploads/
 # Logs
 logs
 *.log
