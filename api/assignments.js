@@ -96,7 +96,9 @@ router.patch('/:id', authenticateRole(["admin", "instructor"]), async (req, res)
 router.delete('/:id', authenticateRole(["admin", "instructor"]), async (req, res, next) => {
     try {
         const assignment = await getAssignmentById(req.params.id);
-        if (req.role == "admin" || await checkIfInstructorTeachesCourse(req.user, assignment["courseid"])) {
+        if (!assignment) {
+            next();
+        } else if (req.role == "admin" || await checkIfInstructorTeachesCourse(req.user, assignment["courseid"])) {
             const sucessful = await deleteAssignment(req.params.id);
             if (sucessful) {
                 res.status(204).send({});
@@ -120,10 +122,13 @@ router.delete('/:id', authenticateRole(["admin", "instructor"]), async (req, res
  * GET /assignments/{id}/submissions - Returns the list of all Submissions for an Assignment.  This list should be paginated.  
  * Only an authenticated User with 'admin' role or an authenticated 'instructor' User whose ID matches the `instructorId` of the Course corresponding to the Assignment's `courseId` can fetch the Submissions for an Assignment.
  */
-router.get('/:id/submissions', authenticateRole(["admin", "instructor"]), async (req, res) => {
+router.get('/:id/submissions', authenticateRole(["admin", "instructor"]), async (req, res, next) => {
     try {
-        const assignment = getAssignmentById(req.params.id);
-        if (req.role == "admin" || req.role == await checkIfInstructorTeachesCourse(req.user, assignment["courseid"])) {
+        const assignment = await getAssignmentById(req.params.id);
+        console.log(assignment)
+        if (!assignment) {
+            next();
+        } else if (req.role == "admin" || await checkIfInstructorTeachesCourse(req.user, assignment["courseid"])) {
             let page = parseInt(req.query.page) || 1;
             let studentid = parseInt(req.query.studentId) || -1;
             const submissionsPage = await getSubmissionPage(page, req.params.id, studentid);

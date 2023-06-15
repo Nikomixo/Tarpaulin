@@ -89,7 +89,7 @@ router.post('/login', async (req, res) => {
  * If the User has the 'student' role, the response should include a list of the IDs of the Courses the User is enrolled in.  
  * Only an authenticated User whose ID matches the ID of the requested User can fetch this information.
  */
-router.get('/:id', authenticateRole(["admin", "instructor", "student"]), async (req, res) => {
+router.get('/:id', authenticateRole(["admin", "instructor", "student"]), async (req, res, next) => {
     try {
         if (!userExists(req.params.id)) {
             res.status(404).send({

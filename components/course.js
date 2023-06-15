@@ -17,10 +17,13 @@ const AddOrRemoveStudentsSchema = {
 exports.AddOrRemoveStudentsSchema = AddOrRemoveStudentsSchema
 
 async function checkIfInstructorTeachesCourse(instructorId, courseId) {
+    console.log("courseid:", courseId)
+    console.log("instructorid:", instructorId)
     const [results] = await db.query(
         'SELECT * FROM courses WHERE id = ?',
         [courseId],
     );
+    console.log(results);
     newid = results[0]["instructorid"];
     return instructorId == newid;
 }
